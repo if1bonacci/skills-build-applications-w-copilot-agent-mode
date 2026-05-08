@@ -1,29 +1,24 @@
 from django.test import TestCase
-from .models import User, Team, Activity, Leaderboard, Workout
+from .models import User, Team, Activity, Workout, Leaderboard
 
-class UserModelTest(TestCase):
-    def test_create_user(self):
-        user = User.objects.create(name='Test User', email='test@example.com', team='marvel')
-        self.assertEqual(user.name, 'Test User')
-
-class TeamModelTest(TestCase):
+class ModelSmokeTest(TestCase):
     def test_create_team(self):
-        team = Team.objects.create(name='marvel', description='Marvel Team')
-        self.assertEqual(team.name, 'marvel')
-
-class ActivityModelTest(TestCase):
+        team = Team.objects.create(name='Marvel', description='Marvel Team')
+        self.assertEqual(str(team), 'Marvel')
+    def test_create_user(self):
+        team = Team.objects.create(name='DC', description='DC Team')
+        user = User.objects.create(name='Clark Kent', email='clark@dc.com', team=team, is_superhero=True)
+        self.assertEqual(str(user), 'Clark Kent')
     def test_create_activity(self):
-        user = User.objects.create(name='Test User', email='test2@example.com', team='dc')
-        activity = Activity.objects.create(user=user, type='run', duration=30, date='2024-01-01')
-        self.assertEqual(activity.type, 'run')
-
-class LeaderboardModelTest(TestCase):
-    def test_create_leaderboard(self):
-        team = Team.objects.create(name='dc', description='DC Team')
-        leaderboard = Leaderboard.objects.create(team=team, points=100)
-        self.assertEqual(leaderboard.points, 100)
-
-class WorkoutModelTest(TestCase):
+        team = Team.objects.create(name='Marvel', description='Marvel Team')
+        user = User.objects.create(name='Tony Stark', email='tony@marvel.com', team=team, is_superhero=True)
+        activity = Activity.objects.create(user=user, type='Running', duration=30, date='2025-12-05')
+        self.assertEqual(str(activity), 'Tony Stark - Running')
     def test_create_workout(self):
-        workout = Workout.objects.create(name='Pushups', description='Do pushups', difficulty='easy')
-        self.assertEqual(workout.name, 'Pushups')
+        workout = Workout.objects.create(name='Pushups', description='Upper body')
+        self.assertEqual(str(workout), 'Pushups')
+    def test_create_leaderboard(self):
+        team = Team.objects.create(name='Marvel', description='Marvel Team')
+        user = User.objects.create(name='Peter Parker', email='peter@marvel.com', team=team, is_superhero=True)
+        leaderboard = Leaderboard.objects.create(user=user, score=100)
+        self.assertEqual(str(leaderboard), 'Peter Parker - 100')

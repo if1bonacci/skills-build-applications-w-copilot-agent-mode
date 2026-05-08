@@ -16,40 +16,35 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
-from .views import UserViewSet, TeamViewSet, ActivityViewSet, LeaderboardViewSet, WorkoutViewSet
-from rest_framework.schemas import get_schema_view
-from rest_framework.documentation import include_docs_urls
+from . import views
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
 router = routers.DefaultRouter()
-router.register(r'users', UserViewSet)
-router.register(r'teams', TeamViewSet)
-router.register(r'activities', ActivityViewSet)
-router.register(r'leaderboard', LeaderboardViewSet)
-router.register(r'workouts', WorkoutViewSet)
+router.register(r'users', views.UserViewSet)
+router.register(r'teams', views.TeamViewSet)
+router.register(r'activities', views.ActivityViewSet)
+router.register(r'workouts', views.WorkoutViewSet)
+router.register(r'leaderboard', views.LeaderboardViewSet)
 
-import os
 @api_view(['GET'])
 def api_root(request, format=None):
+    import os
     codespace_name = os.environ.get('CODESPACE_NAME')
     if codespace_name:
-        base_url = f"https://{codespace_name}-8000.app.github.dev"
+        base_url = f"https://{codespace_name}-8000.app.github.dev/api/"
     else:
-        scheme = 'https' if request.is_secure() else 'http'
-        base_url = f"{scheme}://{request.get_host()}"
+        base_url = request.build_absolute_uri('api/')
     return Response({
-        'users': f'{base_url}/api/users/',
-        'teams': f'{base_url}/api/teams/',
-        'activities': f'{base_url}/api/activities/',
-        'leaderboard': f'{base_url}/api/leaderboard/',
-        'workouts': f'{base_url}/api/workouts/',
+        'users': base_url + 'users/',
+        'teams': base_url + 'teams/',
+        'activities': base_url + 'activities/',
+        'leaderboard': base_url + 'leaderboard/',
+        'workouts': base_url + 'workouts/',
     })
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('', api_root, name='api_root'),
-    path('docs/', include_docs_urls(title='Octofit Tracker API')),
-    path('schema/', get_schema_view(title='Octofit Tracker API', description='API for Octofit Tracker', version='1.0.0'), name='openapi-schema'),
 ]
